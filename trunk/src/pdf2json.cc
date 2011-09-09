@@ -82,8 +82,8 @@ static ArgDesc argDesc[] = {
    "ignore images"},
   {"-noframes", argFlag,   &noframes,      0,
    "use standard output"},
-  {"-zoom",   argFP,    &scale,         0,
-   "zoom the pdf document (default 1.5)"},
+/*  {"-zoom",   argFP,    &scale,         0,
+   "zoom the pdf document (default 1.5)"}, */
   {"-xml",    argFlag,    &xml,         0,
    "output for XML post-processing"},
   {"-hidden", argFlag,   &showHidden,   0,

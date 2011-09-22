@@ -69,7 +69,7 @@
  */
 #undef HAVE_FREETYPE_H
 #undef HAVE_FREETYPE_FREETYPE_H
-#define HAVE_FREETYPE_FREETYPE_H 1
+#undef HAVE_FREETYPE_FREETYPE_H 1
 
 /*
  * This is defined if using FreeType version 2.

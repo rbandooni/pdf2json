@@ -188,11 +188,11 @@ cd ..\src
 
 %CXX% %CXXFLAGS% /c ImgOutPutDev.cc
 
-%CXX% %CXXFLAGS% /c pdf2image.cc
+%CXX% %CXXFLAGS% /c pdf2json.cc
 
 
 
-%CXX% %FPFLAGS% /nologo /Fepdf2image.exe XmlFonts.obj XmlLinks.obj ImgOutPutDev.obj pdf2image.obj ..\goo\libGoo.lib ..\xpdf\libxpdf.lib ..\fofi\libfofi.lib ..\splash\libsplash.lib advapi32.lib Gdi32.lib User32.lib ..\freetype.win32\lib\freetype_a.lib
+%CXX% %FPFLAGS% /nologo /Fepdf2json.exe XmlFonts.obj XmlLinks.obj ImgOutPutDev.obj pdf2json.obj ..\goo\libGoo.lib ..\xpdf\libxpdf.lib ..\fofi\libfofi.lib ..\splash\libsplash.lib advapi32.lib Gdi32.lib User32.lib ..\freetype.win32\lib\freetype_a.lib
 
 
 

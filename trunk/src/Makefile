@@ -11,10 +11,10 @@ FOFILIBDIR = ../fofi
 SPLASHSRCDIR = ../splash
 SPLASHLIBDIR = ../splash
 
-CXXFLAGS = -I/usr/local/include/freetype2 -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -DHAVE_DIRENT_H=1  -I.. -DHAVE_REWINDDIR=1 -DHAVE_POPEN=1 -I.. -I$(GOOSRCDIR) -I$(XPDFSRCDIR) -I$(FOFISRCDIR) -I$(SPLASHSRCDIR) -I$(srcdir)           -I/usr/X11R6/include
+CXXFLAGS = -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -DHAVE_DIRENT_H=1  -I.. -DHAVE_REWINDDIR=1 -DHAVE_POPEN=1 -I.. -I$(GOOSRCDIR) -I$(XPDFSRCDIR) -I$(FOFISRCDIR) -I$(SPLASHSRCDIR) -I$(srcdir)           -I/usr/X11R6/include
 
 LDFLAGS = 
-FTLIBS = -lfreetype
+FTLIBS = 
 
 OTHERLIBS = 
 

@@ -68,7 +68,7 @@
 /*
  * One of these is defined if using FreeType (version 1 or 2).
  */
-#define HAVE_FREETYPE_FREETYPE_H 1
+/* #define HAVE_FREETYPE_FREETYPE_H 1 */
 
 /*
  * This is defined if using FreeType version 2.

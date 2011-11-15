@@ -160,6 +160,10 @@ private:
   GString *imgExt;
   int pageWidth;
   int pageHeight;
+  int X1;
+  int X2;    
+  int Y1;
+  int Y2;        
   static int pgNum;
   int firstPage;                // used to begin the numeration of pages
 
@@ -233,7 +237,7 @@ public:
   //----- initialization and control
 
   // Start a page.
-  virtual void startPage(int pageNum, GfxState *state);
+  virtual void startPage(int pageNum, GfxState *state, double x1,double y1,double x2,double y2);
 
   // End a page.
   virtual void endPage();

@@ -38,7 +38,7 @@
 static int firstPage = 1;
 static int lastPage = 0;
 static GBool rawOrder = gTrue;
-static GBool textAsJSON = gFalse;
+static GBool textAsJSON = gTrue;
 static GBool compressData = gFalse;
 GBool printCommands = gTrue;
 static GBool printHelp = gFalse;
@@ -68,8 +68,6 @@ static ArgDesc argDesc[] = {
    "first page to convert"},
   {"-l",      argInt,      &lastPage,      0,
    "last page to convert"},
-  {"-JSON",   argFlag,	   &textAsJSON,	   0,
-    "Write text data in JSON format"},
   {"-compress",   argFlag, &compressData,  0,
     "Use compressed mode"},
   {"-q",      argFlag,     &errQuiet,      0,

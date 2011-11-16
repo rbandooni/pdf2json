@@ -14,7 +14,7 @@ srcdir = .
 GOOSRCDIR = $(srcdir)/../goo
 GOOLIBDIR = ../goo
 
-CXXFLAGS = -I/usr/local/include/freetype2 -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -I.. -I$(GOOSRCDIR) -I$(srcdir)
+CXXFLAGS = -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -I.. -I$(GOOSRCDIR) -I$(srcdir)
 
 CXX = g++
 AR = ar rc

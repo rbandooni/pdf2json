@@ -12,7 +12,7 @@ srcdir = .
 
 
 CFLAGS = -g -O2 -DHAVE_CONFIG_H -I.. -I$(srcdir)
-CXXFLAGS = -I/usr/local/include/freetype2 -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -I.. -I$(srcdir)
+CXXFLAGS = -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -I.. -I$(srcdir)
 
 CC = gcc
 CXX = g++

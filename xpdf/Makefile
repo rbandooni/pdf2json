@@ -24,7 +24,7 @@ CXXFLAGS = -I/usr/local/include -DHAVE_CONFIG_H -I.. -I$(GOOSRCDIR) -I$(FOFISRCD
 LDFLAGS = 
 
 T1LIBS = 
-FTLIBS = -lfreetype
+FTLIBS = 
 
 XLIBS =         -lX11 
 

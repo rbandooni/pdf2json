@@ -16,7 +16,7 @@ GOOLIBDIR = ../goo
 FOFISRCDIR = $(srcdir)/../fofi
 FOFILIBDIR = ../fofi
 
-CXXFLAGS = -I/usr/local/include -DHAVE_CONFIG_H -I.. -I$(GOOSRCDIR) -I$(FOFISRCDIR) -I$(srcdir)  
+CXXFLAGS = -I/usr/local/include -g -O2 -DHAVE_CONFIG_H -I.. -I$(GOOSRCDIR) -I$(FOFISRCDIR) -I$(srcdir)
 
 CXX = g++
 AR = ar rc
@@ -30,7 +30,7 @@ LIBPREFIX = lib
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
-
+	
 #------------------------------------------------------------------------
 
 CXX_SRC = \

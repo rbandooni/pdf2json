@@ -318,6 +318,7 @@ void HtmlPage::endString() {
 
   // throw away zero-length strings -- they don't have valid xMin/xMax
   // values, and they're useless anyway
+    
   if (curStr->len == 0) {
     delete curStr;
     curStr = NULL;
@@ -394,11 +395,10 @@ void HtmlPage::coalesce() {
   }
   printf("\n------------------------------------------------------------\n\n");
 #endif
+    
+    
   str1 = yxStrings;
-
   if( !str1 ) return;
-
-  str1 = yxStrings;
   
   hfont1 = getFont(str1);
 
@@ -408,7 +408,6 @@ void HtmlPage::coalesce() {
     str1->htext->insert(0, ls);
     delete ls;
   }
-  return;
 
   curX = str1->xMin; curY = str1->yMin;
   lastX = str1->xMin; lastY = str1->yMin;
@@ -420,177 +419,122 @@ void HtmlPage::coalesce() {
     addLineBreak = !noMerge && (fabs(str1->xMin - str2->xMin) < 0.4);
     vertSpace = str2->yMin - str1->yMax;
 
-//printf("coalesce %d %d %f? ", str1->dir, str2->dir, d);
+    //printf("coalesce %d %d %f? ", str1->dir, str2->dir, d);
 
     if (str2->yMin >= str1->yMin && str2->yMin <= str1->yMax)
     {
-	vertOverlap = str1->yMax - str2->yMin;
+        vertOverlap = str1->yMax - str2->yMin;
     } else
-    if (str2->yMax >= str1->yMin && str2->yMax <= str1->yMax)
-    {
-	vertOverlap = str2->yMax - str1->yMin;
-    } else
-    {
-    	vertOverlap = 0;
-    } 
+        if (str2->yMax >= str1->yMin && str2->yMax <= str1->yMax)
+        {
+            vertOverlap = str2->yMax - str1->yMin;
+        } else
+        {
+            vertOverlap = 0;
+        } 
     
-    if (
-	(
-	 (
-	  (
-	   (rawOrder && vertOverlap > 0.5 * space) 
-	   ||
-	   (!rawOrder && str2->yMin < str1->yMax)
-	  ) &&
-	  (horSpace > -0.5 * space && horSpace < space)
-	 ) ||
-       	 (vertSpace >= 0 && vertSpace < 0.5 * space && addLineBreak)
-	) &&
- // in complex mode fonts must be the same, in other modes fonts do not metter
-	str1->dir == str2->dir // text direction the same
+    // str1->dir == str2->dir, in complex mode fonts must be the same, in other modes fonts do not metter
+    if ((((
+           (rawOrder && vertOverlap > 0.5 * space)
+           ||
+           (!rawOrder && str2->yMin < str1->yMax)
+           ) &&
+            (horSpace > -0.5 * space && horSpace < space)
+           ) ||
+            (vertSpace >= 0 && vertSpace < 0.5 * space && addLineBreak)
+           ) 
+        &&
+        str1->dir == str2->dir // text direction the same
+        && 
+        !(str2->len == 1 && str2->htext->getCString()[0] == ' ')
+        &&
+        !(str1->htext->getCString()[str1->len-1] == ' ')
        ) 
     {
-     diff = str2->xMax - str1->xMin;
+        diff = str2->xMax - str1->xMin;
 
-     n = str1->len + str2->len;
-     if ((addSpace = horSpace > 0.1 * space)) {
-        ++n;
-      }
-    
-      if (addLineBreak) {
-        ++n;
-      }
-  
-      str1->size = (n + 15) & ~15;
-      str1->text = (Unicode *)grealloc(str1->text,
-				       str1->size * sizeof(Unicode));
-      str1->xRight = (double *)grealloc(str1->xRight,
+        n = str1->len + str2->len;
+      
+        str1->size = (n + 15) & ~15;
+        str1->text = (Unicode *)grealloc(str1->text,
+				       str1->size * sizeof(Unicode));   
+        str1->xRight = (double *)grealloc(str1->xRight,
 					str1->size * sizeof(double));
-      if (addSpace) {
-		/*  if (addSpace > (xoutRoundLower(hfont1->getSize()/scale)))
-		  {
-		  	str1->text[str1->len] = 0x20;
-			str1->htext->append(" ");
-			str1->htext2->append(" ");
-			str1->xRight[str1->len] = str2->xMin;
-			++str1->len;
-			++str1->strSize;
-		 } */
-  	   	 str1->text[str1->len] = 0x20;
-                 str1->htext->append(" ");
-                 str1->htext2->append(" ");
-                 str1->xRight[str1->len] = str2->xMin;
-                 ++str1->len;
-                ++str1->strSize;
-      }
-      if (addLineBreak) {
-	  str1->text[str1->len] = '\n';
-	  str1->htext->append("<br>");
-	  str1->htext2->append(" ");
-	  str1->xRight[str1->len] = str2->xMin;
-	  ++str1->len;
-	  str1->yMin = str2->yMin;
-	  str1->yMax = str2->yMax;
-	  str1->xMax = str2->xMax;
-	  int fontLineSize = hfont1->getLineSize();
-	  int curLineSize = (int)(vertSpace + space); 
+      
+        str1->htext2->append(str2->htext2);
 
-	  if( curLineSize != fontLineSize )
-	  {
-	      XmlFont *newfnt = new XmlFont(*hfont1);
-	      newfnt->setLineSize(curLineSize);
-	      str1->fontpos = fonts->AddFont(*newfnt);
-	      delete newfnt;
-	      hfont1 = getFont(str1);
-	      // we have to reget hfont2 because it's location could have
-	      // changed on resize  GStri;ng *iStr=GString::fromInt(i);
-	      hfont2 = getFont(str2); 
-	  }
+        XmlLink *hlink1 = str1->getLink();
+        XmlLink *hlink2 = str2->getLink();
 
-      }
-      str1->htext2->append(str2->htext2);
+        for (i = 0; i < str2->len; ++i) {
+            str1->text[str1->len] = str2->text[i];
+            str1->xRight[str1->len] = str2->xRight[i];
+            ++str1->len;
+        }
 
-      XmlLink *hlink1 = str1->getLink();
-      XmlLink *hlink2 = str2->getLink();
+        if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
+            if(hlink1 != NULL )
+                str1->htext->append("</a>");
+            if(hlink2 != NULL ) {
+                GString *ls = hlink2->getLinkStart();
+                str1->htext->append(ls);
+                delete ls;
+            }
+        }
 
-      GString *fntFix;
-      GString *iStr=GString::fromInt(str2->fontpos);     
-      fntFix = new GString("</span><span class=\"ft");
-      fntFix->append(iStr);
-      fntFix->append("\">");
-      if (((hlink1 == NULL) && (hlink2 == NULL)) && (hfont1->isEqualIgnoreBold(*hfont2) == gFalse))
-      {
-	str1->htext->append(fntFix);
-      }
-      for (i = 0; i < str2->len; ++i) {
-	str1->text[str1->len] = str2->text[i];
-	str1->xRight[str1->len] = str2->xRight[i];
-	++str1->len;
-      }
+        str1->htext->append(str2->htext);
+        sSize = str1->htext2->getLength();      
+        pxSize = xoutRoundLower(hfont1->getSize()/scale);
+        strSize = (pxSize*(sSize-2));   
+        cspace = (diff / strSize);//(strSize-pxSize));
+        // we check if the fonts are the same and create a new font to ajust the text
+        //      double diff = str2->xMin - str1->xMin;
+        //      printf("%s\n",str1->htext2->getCString());
+        // str1 now contains href for link of str2 (if it is defined)
+        str1->link = str2->link; 
 
-      if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
-	if(hlink1 != NULL )
-	  str1->htext->append("</a>");
-	if(hlink2 != NULL ) {
-	  GString *ls = hlink2->getLinkStart();
-	  str1->htext->append(ls);
-	  delete ls;
-	}
-      }
+        //XmlFont *newfnt = new XmlFont(*hfont1);
+        //newfnt->setCharSpace(cspace);
+        //newfnt->setLineSize(curLineSize);
+        //str1->fontpos = fonts->AddFont(*newfnt);
+        //delete newfnt;
+        hfont1 = getFont(str1);
+        // we have to reget hfont2 because it's location could have
+        // changed on resize  GStri;ng *iStr=GString::fromInt(i);
+        hfont2 = getFont(str2); 
 
-      str1->htext->append(str2->htext);
-      sSize = str1->htext2->getLength();      
-      pxSize = xoutRoundLower(hfont1->getSize()/scale);
-      strSize = (pxSize*(sSize-2));   
-      cspace = (diff / strSize);//(strSize-pxSize));
-     // we check if the fonts are the same and create a new font to ajust the text
-//      double diff = str2->xMin - str1->xMin;
-//      printf("%s\n",str1->htext2->getCString());
-      // str1 now contains href for link of str2 (if it is defined)
-      str1->link = str2->link; 
+        hfont1 = hfont2;
 
-      XmlFont *newfnt = new XmlFont(*hfont1);
-      newfnt->setCharSpace(cspace);
-      //newfnt->setLineSize(curLineSize);
-      str1->fontpos = fonts->AddFont(*newfnt);
-      delete newfnt;
-      hfont1 = getFont(str1);
-      // we have to reget hfont2 because it's location could have
-      // changed on resize  GStri;ng *iStr=GString::fromInt(i);
-      hfont2 = getFont(str2); 
+        if (str2->xMax > str1->xMax) {
+            str1->xMax = str2->xMax;
+        }
+        
+        if (str2->yMax > str1->yMax) {
+            str1->yMax = str2->yMax;
+        }
 
-      hfont1 = hfont2;
+        str1->yxNext = str2->yxNext;
 
-      if (str2->xMax > str1->xMax) {
-	str1->xMax = str2->xMax;
-      }
-
-      if (str2->yMax > str1->yMax) {
-	str1->yMax = str2->yMax;
-      }
-
-      str1->yxNext = str2->yxNext;
-
-      delete str2;
+        delete str2;
     } else { 
 
-//     printf("startX = %f, endX = %f, diff = %f, fontsize = %d, pxSize = %f, stringSize = %d, cspace = %f, strSize = %f\n",str1->xMin,str1->xMax,diff,hfont1->getSize(),pxSize,sSize,cspace,strSize);
+        //     printf("startX = %f, endX = %f, diff = %f, fontsize = %d, pxSize = %f, stringSize = %d, cspace = %f, strSize = %f\n",str1->xMin,str1->xMax,diff,hfont1->getSize(),pxSize,sSize,cspace,strSize);
 
-// keep strings separate
-//      printf("no\n"); 
-//      if( hfont1->isBold() )
-      if(str1->getLink() != NULL )
-	str1->htext->append("</a>");  
+        // keep strings separate
+        //      printf("no\n"); 
+        //      if( hfont1->isBold() )
+        if(str1->getLink() != NULL )
+            str1->htext->append("</a>");  
      
-      str1->xMin = curX; str1->yMin = curY; 
-      str1 = str2;
-      curX = str1->xMin; curY = str1->yMin;
-      hfont1 = hfont2;
+        str1->xMin = curX; str1->yMin = curY; 
+        str1 = str2;
+        curX = str1->xMin; curY = str1->yMin;
+        hfont1 = hfont2;
 
-      if( str1->getLink() != NULL ) {
-	GString *ls = str1->getLink()->getLinkStart();
-	str1->htext->insert(0, ls);
-	delete ls;
+        if( str1->getLink() != NULL ) {
+            GString *ls = str1->getLink()->getLinkStart();
+            str1->htext->insert(0, ls);
+            delete ls;
       }
     }
   }
@@ -606,7 +550,7 @@ void HtmlPage::coalesce() {
 	   (int)(str1->yMax - str1->yMin));
     printf("'%s'\n", str1->htext->getCString());  
   }
-  printf("\n------------------------------------------------------------\n\n");
+  printf("\n-end--------------------------------------------------------\n\n");
 #endif
 
 }
@@ -625,7 +569,7 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){
 
   GBool passedFirst = false;
 
-  if(textAsJSON){fprintf(f,"\"fonts\":[");}
+  /* if(textAsJSON){fprintf(f,"\"fonts\":[");}
   for(int i=fontsPageMarker;i < fonts->size();i++) {
     GString *fontCSStyle = fonts->CSStyle(i,textAsJSON);
     if(textAsJSON && passedFirst) {fprintf(f,",");}
@@ -634,12 +578,13 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){
     delete fontCSStyle;
   }
   if(textAsJSON){fprintf(f,"]");}
-  
+  */
   GString *str, *str1;
   
   passedFirst = false;
   if(textAsJSON){
-     fprintf(f,",\"text\":[");
+     //fprintf(f,",\"text\":[");
+      fprintf(f,"\"text\":[");
   }
 
   for(HtmlString *tmp=yxStrings;tmp;tmp=tmp->yxNext){
@@ -1177,6 +1122,7 @@ void ImgOutputDev::drawLink(Link* link,Catalog *cat){
   GString* _dest=getLinkDest(link,cat);
   XmlLink t((double) x1,(double) y2,(double) x2,(double) y1,_dest);
   pages->AddLink(t);
+printf("addLink");
   delete _dest;
 }
 

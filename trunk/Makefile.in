@@ -40,7 +40,7 @@ install: dummy
 	$(INSTALL_PROGRAM) xpdf/pdffonts$(EXE) $(DESTDIR)${exec_prefix}/bin/pdffonts$(EXE)
 #	$(INSTALL_PROGRAM) xpdf/pdftoppm$(EXE) $(DESTDIR)${exec_prefix}/bin/pdftoppm$(EXE)
 	$(INSTALL_PROGRAM) xpdf/pdfimages$(EXE) $(DESTDIR)${exec_prefix}/bin/pdfimages$(EXE)
-	$(INSTALL_PROGRAM) src/pdf2image$(EXE) $(DESTDIR)${exec_prefix}/bin/pdf2image$(EXE)
+	$(INSTALL_PROGRAM) src/pdf2json$(EXE) $(DESTDIR)${exec_prefix}/bin/pdf2json$(EXE)
 	-mkdir -p $(DESTDIR)${prefix}/man/man1
 #	$(INSTALL_DATA) $(srcdir)/doc/xpdf.1 $(DESTDIR)${prefix}/man/man1/xpdf.1
 	$(INSTALL_DATA) $(srcdir)/doc/pdftops.1 $(DESTDIR)${prefix}/man/man1/pdftops.1

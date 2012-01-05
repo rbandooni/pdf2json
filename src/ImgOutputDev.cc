@@ -238,6 +238,7 @@ void HtmlPage::conv(){
 
   int linkIndex = 0;
   XmlFont* h;
+
   for(tmp=yxStrings;tmp;tmp=tmp->yxNext){
      int pos=tmp->fontpos;
      //  printf("%d\n",pos);
@@ -473,8 +474,10 @@ void HtmlPage::coalesce() {
         }
 
         if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
-            if(hlink1 != NULL )
-                str1->htext->append("</a>");
+            
+            if(hlink1 != NULL ){
+                //str1->htext->append("\"]");
+            }
             if(hlink2 != NULL ) {
                 GString *ls = hlink2->getLinkStart();
                 str1->htext->append(ls);
@@ -523,8 +526,8 @@ void HtmlPage::coalesce() {
         // keep strings separate
         //      printf("no\n"); 
         //      if( hfont1->isBold() )
-        if(str1->getLink() != NULL )
-            str1->htext->append("</a>");  
+//        if(str1->getLink() != NULL )
+  //          str1->htext->append("\"]");  
      
         str1->xMin = curX; str1->yMin = curY; 
         str1 = str2;
@@ -535,13 +538,13 @@ void HtmlPage::coalesce() {
             GString *ls = str1->getLink()->getLinkStart();
             str1->htext->insert(0, ls);
             delete ls;
-      }
+        }
     }
   }
   str1->xMin = curX; str1->yMin = curY;
 
-  if(str1->getLink() != NULL )
-    str1->htext->append("</a>");
+//  if(str1->getLink() != NULL )
+  //  str1->htext->append("]");
 
 #if 0 //~ for debugging
   for (str1 = yxStrings; str1; str1 = str1->yxNext) {
@@ -593,60 +596,62 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){
       
       if(!compressData){
 	      if(textAsJSON){      
-		  if(passedFirst){
-		    fprintf(f,",");
-		  }
-          
-          fprintf(f,"{\"top\":%d,\"left\":%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
-		  fprintf(f,"\"width\":%d,\"height\":%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
-		  fprintf(f,"\"font\":%d,\"data\":\"", tmp->fontpos);
-		  if (tmp->fontpos!=-1){
-		     str1=fonts->getCSStyle(tmp->fontpos, str);
-		  }
-		  fputs(str1->getCString(),f);
-		  fprintf(f,"\"}");
-		  passedFirst = true;
+              if(passedFirst){
+                  fprintf(f,",");
+              }
+              fprintf(f,"{\"top\":%d,\"left\":%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
+              fprintf(f,"\"width\":%d,\"height\":%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
+              fprintf(f,"\"font\":%d,\"data\":\"", tmp->fontpos);
+              if (tmp->fontpos!=-1){
+                  str1=fonts->getCSStyle(tmp->fontpos, str);
+              }
+              fputs(str1->getCString(),f);
+              fprintf(f,"\"}");
+              //fprintf(f,"\"}");
+              passedFirst = true;
 	      }else{
-		  fprintf(f,"<text top=\"%d\" left=\"%d\" ",xoutRound(tmp->yMin),xoutRound(tmp->xMin));
-		  fprintf(f,"width=\"%d\" height=\"%d\" ",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
-		  fprintf(f,"font=\"%d\">", tmp->fontpos);
-		  if (tmp->fontpos!=-1){
-		     str1=fonts->getCSStyle(tmp->fontpos, str);
-		  }
-		  fputs(str1->getCString(),f);
-		  delete str;
-		  delete str1;
-		  fputs("</text>\n",f);
+              fprintf(f,"<text top=\"%d\" left=\"%d\" ",xoutRound(tmp->yMin),xoutRound(tmp->xMin));
+              fprintf(f,"width=\"%d\" height=\"%d\" ",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
+              fprintf(f,"font=\"%d\">", tmp->fontpos);
+              if (tmp->fontpos!=-1){
+                  str1=fonts->getCSStyle(tmp->fontpos, str);
+              }
+              fputs(str1->getCString(),f);
+              delete str;
+              delete str1;
+              fputs("</text>\n",f);
 	      }
       }else{
 		if(textAsJSON){      
-		  if(passedFirst){
-		    fprintf(f,",");
-		  }
+            if(passedFirst){
+              fprintf(f,",");
+            }
           
-          //fprintf(f,"{\"t\":%d,\"l\":%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
-		  //fprintf(f,"\"w\":%d,\"h\":%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
-		  //fprintf(f,"\"f\":%d,\"d\":\"", tmp->fontpos);
-          fprintf(f,"[%d,%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
-          fprintf(f,"%d,%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
-          fprintf(f,"%d,\"", tmp->fontpos);           
-		  if (tmp->fontpos!=-1){
-		     str1=fonts->getCSStyle(tmp->fontpos, str);
-		  }
-		  fputs(str1->getCString(),f);
-		  fprintf(f,"\"]");
-		  passedFirst = true;
-	      }else{
-		  fprintf(f,"<t t=\"%d\" l=\"%d\" ",xoutRound(tmp->yMin),xoutRound(tmp->xMin));
-		  fprintf(f,"w=\"%d\" h=\"%d\" ",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
-		  fprintf(f,"f=\"%d\">", tmp->fontpos);
-		  if (tmp->fontpos!=-1){
-		     str1=fonts->getCSStyle(tmp->fontpos, str);
-		  }
-		  fputs(str1->getCString(),f);
-		  delete str;
-		  delete str1;
-		  fputs("</t>\n",f);
+            //fprintf(f,"{\"t\":%d,\"l\":%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
+            //fprintf(f,"\"w\":%d,\"h\":%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
+            //fprintf(f,"\"f\":%d,\"d\":\"", tmp->fontpos);
+            fprintf(f,"[%d,%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
+            fprintf(f,"%d,%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
+            fprintf(f,"%d,\"", tmp->fontpos);
+		  
+            if (tmp->fontpos!=-1){
+                str1=fonts->getCSStyle(tmp->fontpos, str);
+            }
+            fputs(str1->getCString(),f);
+            fprintf(f,"\"]");
+            
+            passedFirst = true;
+        }else{
+              fprintf(f,"<t t=\"%d\" l=\"%d\" ",xoutRound(tmp->yMin),xoutRound(tmp->xMin));
+              fprintf(f,"w=\"%d\" h=\"%d\" ",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
+              fprintf(f,"f=\"%d\">", tmp->fontpos);
+              if (tmp->fontpos!=-1){
+                  str1=fonts->getCSStyle(tmp->fontpos, str);
+              }
+              fputs(str1->getCString(),f);
+              delete str;
+              delete str1;
+              fputs("</t>\n",f);
 	      }
       }
     }
@@ -666,8 +671,6 @@ void HtmlPage::dump(FILE *f, int pageNum, GBool passedFirstPage)
     if (xml) dumpAsXML(f, pageNum, passedFirstPage);
   }
 }
-
-
 
 void HtmlPage::clear() {
   HtmlString *p1, *p2;
@@ -785,7 +788,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.42"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.51"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  
@@ -920,7 +923,7 @@ void ImgOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
 			      GBool inlineImg) {
 
   int i, j;
-  
+
   if (ignore||complexMode) {
     OutputDev::drawImageMask(state, ref, str, width, height, invert, inlineImg);
     return;
@@ -1011,7 +1014,7 @@ void ImgOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 			  int *maskColors, GBool inlineImg) {
 
   int i, j;
-   
+
   if (ignore||complexMode) {
     OutputDev::drawImage(state, ref, str, width, height, colorMap, 
 			 maskColors, inlineImg);
@@ -1068,7 +1071,6 @@ void ImgOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
     yFlip = ht > 0;
   }
 
-   
   /*if( !globalParams->getErrQuiet() )
     printf("image stream of kind %d\n", str->getKind());*/
   // dump JPEG file
@@ -1107,8 +1109,6 @@ void ImgOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
   }
 }
 
-
-
 void ImgOutputDev::drawLink(Link* link,Catalog *cat){
   double _x1,_y1,_x2,_y2,w;
   int x1,y1,x2,y2;
@@ -1122,7 +1122,6 @@ void ImgOutputDev::drawLink(Link* link,Catalog *cat){
   GString* _dest=getLinkDest(link,cat);
   XmlLink t((double) x1,(double) y2,(double) x2,(double) y1,_dest);
   pages->AddLink(t);
-printf("addLink");
   delete _dest;
 }
 
@@ -1132,110 +1131,84 @@ GString* ImgOutputDev::getLinkDest(Link *link,Catalog* catalog){
   {
       case actionGoTo:
 	  { 
-	  GString* file=basename(Docname);
-	  int page=1;
-	  LinkGoTo *ha=(LinkGoTo *)link->getAction();
-	  LinkDest *dest=NULL;
-	  if (ha->getDest()==NULL) 
-	      dest=catalog->findDest(ha->getNamedDest());
-	  else 
-	      dest=ha->getDest()->copy();
-	  if (dest){ 
-	      if (dest->isPageRef()){
-		  Ref pageref=dest->getPageRef();
-		  page=catalog->findPage(pageref.num,pageref.gen);
-	      }
+          GString* file=new GString("actionGoTo:");
+          int page=1;
+          LinkGoTo *ha=(LinkGoTo *)link->getAction();
+          LinkDest *dest=NULL;
+          if (ha->getDest()==NULL) 
+              dest=catalog->findDest(ha->getNamedDest());
+          else 
+              dest=ha->getDest()->copy();
+          if (dest){ 
+              if (dest->isPageRef()){
+                  Ref pageref=dest->getPageRef();
+                  page=catalog->findPage(pageref.num,pageref.gen);
+              }
 	      else {
-		  page=dest->getPageNum();
+              page=dest->getPageNum();
 	      }
 
 	      delete dest;
 
 	      GString *str=GString::fromInt(page);
-	      /* 		complex 	simple
-	       	frames		file-4.html	files.html#4
-		noframes	file.html#4	file.html#4
-	       */
-	      if (noframes)
-	      {
-		  file->append(".html#");
-		  file->append(str);
-	      }
-	      else
-	      {
-	      	if( complexMode ) 
-		{
-		    file->append("-");
-		    file->append(str);
-		    file->append(".html");
-		}
-		else
-		{
-		    file->append("s.html#");
-		    file->append(str);
-		}
-	      }
-
-	      if (printCommands) printf(" link to page %d ",page);
-	      delete str;
-	      return file;
-	  }
-	  else 
-	  {
-	      return new GString();
-	  }
+          file->append(str);
+          file->append(",");
+              
+          if (printCommands) printf(" link to page %d ",page);
+              delete str;
+              return file;
+          }
+          else 
+          {
+              return new GString();
+          }
 	  }
       case actionGoToR:
 	  {
-	  LinkGoToR *ha=(LinkGoToR *) link->getAction();
-	  LinkDest *dest=NULL;
-	  int page=1;
-	  GString *file=new GString();
-	  if (ha->getFileName()){
-	      delete file;
-	      file=new GString(ha->getFileName()->getCString());
-	  }
-	  if (ha->getDest()!=NULL)  dest=ha->getDest()->copy();
-	  if (dest&&file){
-	      if (!(dest->isPageRef()))  page=dest->getPageNum();
-	      delete dest;
+          LinkGoToR *ha=(LinkGoToR *) link->getAction();
+          LinkDest *dest=NULL;
+          int page=1;
+          GString *file=new GString("actionGoToR:");
+          
+          if (ha->getDest()!=NULL)  dest=ha->getDest()->copy();
+          
+          if (dest&&file){
+              if (!(dest->isPageRef()))  page=dest->getPageNum();
+              delete dest;
 
-	      if (printCommands) printf(" link to page %d ",page);
-	      if (printHtml){
-		  p=file->getCString()+file->getLength()-4;
-		  if (!strcmp(p, ".pdf") || !strcmp(p, ".PDF")){
-		      file->del(file->getLength()-4,4);
-		      file->append(".html");
-		  }
-		  file->append('#');
-		  file->append(GString::fromInt(page));
-	      }
-	  }
-	  if (printCommands) printf("filename %s\n",file->getCString());
-	  return file;
-	  }
+              if (printCommands) printf(" link to page %d ",page);
+              if (printHtml){
+                  p=file->getCString()+file->getLength()-4;
+                  file->append(GString::fromInt(page));
+                  file->append(",");
+              }
+          }
+          if (printCommands) printf("filename %s\n",file->getCString());
+            return file;
+      }
       case actionURI:
 	  { 
-	  LinkURI *ha=(LinkURI *) link->getAction();
-	  GString* file=new GString(ha->getURI()->getCString());
-	  // printf("uri : %s\n",file->getCString());
-	  return file;
+          LinkURI *ha=(LinkURI *) link->getAction();
+          //GString* file=new GString(ha->getURI()->getCString());
+          GString *file=new GString("actionURI:");
+          //file->append(ha->getURI()->getCString());
+          // printf("uri : %s\n",file->getCString());
+          return file;
 	  }
       case actionLaunch:
 	  {
-	  LinkLaunch *ha=(LinkLaunch *) link->getAction();
-	  GString* file=new GString(ha->getFileName()->getCString());
-	  if (printHtml) { 
-	      p=file->getCString()+file->getLength()-4;
-	      if (!strcmp(p, ".pdf") || !strcmp(p, ".PDF")){
-		  file->del(file->getLength()-4,4);
-		  file->append(".html");
-	      }
-	      if (printCommands) printf("filename %s",file->getCString());
+          LinkLaunch *ha=(LinkLaunch *) link->getAction();
+          GString* file=new GString(ha->getFileName()->getCString());
+          if (printHtml) { 
+              p=file->getCString()+file->getLength()-4;
+              if (!strcmp(p, ".pdf") || !strcmp(p, ".PDF")){
+                  file->del(file->getLength()-4,4);
+                  file->append(".html");
+              }
+              if (printCommands) printf("filename %s",file->getCString());
     
-	      return file;      
-  
-	  }
+              return file;     
+          }
 	  }
       default:
 	  return new GString();

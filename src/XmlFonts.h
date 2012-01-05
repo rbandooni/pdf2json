@@ -83,6 +83,7 @@ public:
     return g;
   } 
   GString* getCSStyle (int i, GString* content);
+ /* GString* EscapeSpecialChars(GString* content); */
   GString* CSStyle(int i,GBool textAsJSON);
   int size() const {return accu->size();}
   

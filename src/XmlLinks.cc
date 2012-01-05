@@ -54,9 +54,9 @@ XmlLink& XmlLink::operator=(const XmlLink& x){
 } 
 
 GString* XmlLink::getLinkStart() {
-  GString *res = new GString("<A href=\"");
+  GString *res = new GString("");
   res->append(dest);
-  res->append("\">");
+//  res->append("\">");
   return res;
 }
 

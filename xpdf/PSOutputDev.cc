@@ -2743,7 +2743,7 @@ GBool PSOutputDev::checkPageSlice(Page *page, double hDPI, double vDPI,
   scan = new PreScanOutputDev();
   page->displaySlice(scan, 72, 72, rotateA, useMediaBox, crop,
 		     sliceX, sliceY, sliceW, sliceH,
-		     printing, catalog, abortCheckCbk, abortCheckCbkData);
+		     NULL, printing, catalog, abortCheckCbk, abortCheckCbkData);
   rasterize = scan->usesTransparency();
   delete scan;
 
@@ -2771,7 +2771,7 @@ GBool PSOutputDev::checkPageSlice(Page *page, double hDPI, double vDPI,
   page->displaySlice(splashOut, splashDPI, splashDPI, rotateA,
 		     useMediaBox, crop,
 		     sliceX, sliceY, sliceW, sliceH,
-		     printing, catalog, abortCheckCbk, abortCheckCbkData);
+		     NULL, printing, catalog, abortCheckCbk, abortCheckCbkData);
 
   // start the PS page
   page->makeBox(splashDPI, splashDPI, rotateA, useMediaBox, gFalse,

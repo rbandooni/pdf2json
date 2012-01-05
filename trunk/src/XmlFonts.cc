@@ -267,20 +267,22 @@ int XmlFontAccu::AddFont(const XmlFont& font){
  return (accu->size()-1);
 }
 
-static GString* EscapeSpecialChars( GString* s )
+static GString* EscapeSpecialChars( GString* s)
 {
     GString* tmp = NULL;
     for( int i = 0, j = 0; i < s->getLength(); i++, j++ ){
         const char *replace = NULL;
-        switch ( s->getChar(i) ){
-	        case '"': replace = "\\u0022";  break;
-	        case '\\': replace = "\\u005C";  break;
-		case '<': replace = "\\u003C";  break;
-		case '>': replace = "\\u003E";  break;
-	        case '\'': replace = "\\u0027";  break;
-	        case '&': replace = "\\u0026";  break;
-	        default: continue;
-	    }
+            switch ( s->getChar(i) ){
+                case '"': replace = "\\u0022";  break;
+                case '\\': replace = "\\u005C";  break;
+                case '<': replace = "\\u003C";  break;
+                case '>': replace = "\\u003E";  break;
+                case '\'': replace = "\\u0027";  break;
+                case '&': replace = "\\u0026";  break;
+                case '\n': replace = "";  break;
+                case '\r': replace = "";  break;                    
+                default: continue;
+            }
 	    if( replace ){
 	        if( !tmp ) tmp = new GString( s );
 	        if( tmp ){
@@ -308,7 +310,7 @@ GString* XmlFontAccu::getCSStyle(int i, GString* content){
   } else {
     tmp = EscapeSpecialChars(content);
     //tmp->append(content);
-  }
+  } 
 
   delete iStr;
   return tmp;

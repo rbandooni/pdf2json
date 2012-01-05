@@ -258,18 +258,19 @@ Links *Page::getLinks(Catalog *catalog) {
 
 void Page::display(OutputDev *out, double hDPI, double vDPI,
 		   int rotate, GBool useMediaBox, GBool crop,
-		   GBool printing, Catalog *catalog,
+           Links *links, GBool printing, Catalog *catalog,
 		   GBool (*abortCheckCbk)(void *data),
 		   void *abortCheckCbkData) {
+
   displaySlice(out, hDPI, vDPI, rotate, useMediaBox, crop,
-	       -1, -1, -1, -1, printing, catalog,
+	       -1, -1, -1, -1, links, printing, catalog,
 	       abortCheckCbk, abortCheckCbkData);
 }
 
 void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
 			int rotate, GBool useMediaBox, GBool crop,
 			int sliceX, int sliceY, int sliceW, int sliceH,
-			GBool printing, Catalog *catalog,
+            Links *links, GBool printing, Catalog *catalog,
 			GBool (*abortCheckCbk)(void *data),
 			void *abortCheckCbkData) {
 #ifndef PDF_PARSER_ONLY
@@ -277,6 +278,7 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
   PDFRectangle box;
   Gfx *gfx;
   Object obj;
+  Link *link;
   Annots *annotList;
   Dict *acroForm;
   int i;
@@ -318,6 +320,17 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
     gfx->restoreState();
   }
   obj.free();
+
+  // draw links
+  if (links) {
+        gfx->saveState();
+        for (i = 0; i < links->getNumLinks(); ++i) {
+            link = links->getLink(i);
+            out->drawLink(link, catalog);
+        }
+        gfx->restoreState();
+        out->dump();
+  }    
 
   // draw annotations
   annotList = new Annots(xref, catalog, getAnnots(&obj));

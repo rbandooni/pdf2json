@@ -314,8 +314,10 @@ void PDFDoc::displayPage(OutputDev *out, int page,
   if (globalParams->getPrintCommands()) {
     printf("***** page %d *****\n", page);
   }
+    
+    
   catalog->getPage(page)->display(out, hDPI, vDPI,
-				  rotate, useMediaBox, crop, printing, catalog,
+				  rotate, useMediaBox, crop, getLinks(page), printing, catalog,
 				  abortCheckCbk, abortCheckCbkData);
 }
 
@@ -341,7 +343,7 @@ void PDFDoc::displayPageSlice(OutputDev *out, int page,
   catalog->getPage(page)->displaySlice(out, hDPI, vDPI,
 				       rotate, useMediaBox, crop,
 				       sliceX, sliceY, sliceW, sliceH,
-				       printing, catalog,
+				       getLinks(page), printing, catalog,
 				       abortCheckCbk, abortCheckCbkData);
 }
 

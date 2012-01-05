@@ -110,6 +110,9 @@ public:
 
   double *getDefCTM() { return defCTM; }
   double *getDefICTM() { return defICTM; }
+    
+  //----- link borders
+  virtual void drawLink(Link *link, Catalog *catalog) {}    
 
   //----- save/restore graphics state
   virtual void saveState(GfxState *state) {}

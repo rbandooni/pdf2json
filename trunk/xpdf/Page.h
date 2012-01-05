@@ -151,7 +151,7 @@ public:
   // Display a page.
   void display(OutputDev *out, double hDPI, double vDPI,
 	       int rotate, GBool useMediaBox, GBool crop,
-	       GBool printing, Catalog *catalog,
+	       Links *links, GBool printing, Catalog *catalog,
 	       GBool (*abortCheckCbk)(void *data) = NULL,
 	       void *abortCheckCbkData = NULL);
 
@@ -159,7 +159,7 @@ public:
   void displaySlice(OutputDev *out, double hDPI, double vDPI,
 		    int rotate, GBool useMediaBox, GBool crop,
 		    int sliceX, int sliceY, int sliceW, int sliceH,
-		    GBool printing, Catalog *catalog,
+		    Links *links, GBool printing, Catalog *catalog,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL);
 

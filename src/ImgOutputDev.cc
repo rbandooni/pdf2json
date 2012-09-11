@@ -124,6 +124,11 @@ HtmlString::~HtmlString() {
 
 void HtmlString::addChar(GfxState *state, double x, double y,
 			 double dx, double dy, Unicode u) {
+    
+  if ( !showHidden && (state->getRender() & 3) == 3) {
+    return;
+  }
+    
   if (dir == textDirUnknown) {
     dir = UnicodeMap::getDirection(u);
   } 
@@ -262,6 +267,11 @@ void HtmlPage::conv(){
 void HtmlPage::addChar(GfxState *state, double x, double y,
 		       double dx, double dy, 
 			double ox, double oy, Unicode *u, int uLen) {
+
+  if ( !showHidden && (state->getRender() & 3) == 3) {
+      return;
+  }
+    
   double x1, y1, w1, h1, dx2, dy2;
   int n, i, d;
   state->transform(x, y, &x1, &y1);
@@ -572,7 +582,8 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){
 
   GBool passedFirst = false;
 
-  /* if(textAsJSON){fprintf(f,"\"fonts\":[");}
+  // output fonts
+  if(textAsJSON){fprintf(f,"\"fonts\":[");}
   for(int i=fontsPageMarker;i < fonts->size();i++) {
     GString *fontCSStyle = fonts->CSStyle(i,textAsJSON);
     if(textAsJSON && passedFirst) {fprintf(f,",");}
@@ -581,13 +592,13 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){
     delete fontCSStyle;
   }
   if(textAsJSON){fprintf(f,"]");}
-  */
+  
   GString *str, *str1;
   
   passedFirst = false;
   if(textAsJSON){
-     //fprintf(f,",\"text\":[");
-      fprintf(f,"\"text\":[");
+     fprintf(f,",\"text\":[");
+      //fprintf(f,"\"text\":[");
   }
 
   for(HtmlString *tmp=yxStrings;tmp;tmp=tmp->yxNext){

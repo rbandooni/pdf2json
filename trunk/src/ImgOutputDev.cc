@@ -980,10 +980,10 @@ void ImgOutputDev::endPage() {
   
   // reassign page based on split if split is higher than 1
   if(this->split>0 && (pageNum % this->split) == 0){
-      fputs("]",page);
+      if(textAsJSON){fputs("]",page);}else{fputs("</pdf2xml>\n",page);}
       this->passedFirstPage = gFalse;
       this->setSplitFileName(pageNum + this->split,true);
-      fputs("[",page);      
+      if(textAsJSON){fputs("[",page);}else{fputs("<pdf2xml>\n",page);  }
       //printf("PROCESS: %s",tmp->getCString());
       //printf("mod %d",(this->split-(this->split/pageNum)*pageNum)); 
   }

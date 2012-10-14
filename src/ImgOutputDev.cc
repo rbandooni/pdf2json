@@ -569,14 +569,16 @@ void HtmlPage::coalesce() {
 }
 
 
-void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){  
+void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage, int totalPages){  
+//    printf(this->numPages);
+    printf("");
   if(textAsJSON){
     if(passedFirstPage){
 	fprintf(f, ",");
     }
-    fprintf(f, "{\"number\":%d,\"height\":%d,\"width\":%d,", page,pageHeight,pageWidth);
+    fprintf(f, "{\"number\":%d,\"pages\":%d,\"height\":%d,\"width\":%d,", page,totalPages,pageHeight,pageWidth);
   }else{ 
-    fprintf(f, "<page number=\"%d\"", page);
+    fprintf(f, "<page number=\"%d\" pages=\"%d\"", page,totalPages);
     fprintf(f," height=\"%d\" width=\"%d\">", pageHeight,pageWidth);
   }
 
@@ -675,11 +677,11 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage){
   }
 }
 
-void HtmlPage::dump(FILE *f, int pageNum, GBool passedFirstPage) 
+void HtmlPage::dump(FILE *f, int pageNum, GBool passedFirstPage, int totalPages) 
 {
   if (complexMode)
   {
-    if (xml) dumpAsXML(f, pageNum, passedFirstPage);
+    if (xml) dumpAsXML(f, pageNum, passedFirstPage, totalPages);
   }
 }
 
@@ -776,7 +778,7 @@ char* ImgOutputDev::mapEncodingToHtml(GString* encoding)
 ImgOutputDev::ImgOutputDev(char *fileName, char *title, 
 	char *author, char *keywords, char *subject, char *date,
 	char *extension,
-	GBool rawOrder, GBool textAsJSON, GBool compressData, int firstPage, GBool outline, int numPages) 
+	GBool rawOrder, GBool textAsJSON, GBool compressData, int split, int firstPage, GBool outline, int numPages) 
 {
   char *htmlEncoding;
   this->numPages = numPages;
@@ -788,6 +790,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   this->rawOrder = rawOrder;
   this->textAsJSON = textAsJSON;
   this->compressData = compressData;
+  this->split = split;  
   this->doOutline = outline;
   ok = gFalse;
   passedFirstPage = gFalse;
@@ -799,7 +802,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.52"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.53"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  
@@ -811,17 +814,22 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages->setDocName(fileName);
   Docname=new GString (fileName);
 
+    
   if (noframes) {
     if (stout) page=stdout;
     else {
       GString* right=new GString(fileName);
       //if (xml && !textAsJSON) right->append(".xml");
       //else if (textAsJSON) right->append(".js");
-      if (!(page=fopen(right->getCString(),"w"))){
-	delete right;
-	error(-1, "Couldn't open html file '%s'", right->getCString());
-	return;
-      }  
+      
+      if(this->split>0){
+        this->setSplitFileName(10,false);
+      }else if (!(page=fopen(right->getCString(),"w"))){
+          delete right;
+          error(-1, "Couldn't open html file '%s'", right->getCString());
+          return;
+      } 
+        
       delete right;
     }
 
@@ -891,11 +899,96 @@ void ImgOutputDev::startPage(int pageNum, GfxState *state,double crop_x1, double
   delete str;
 } 
 
+void ImgOutputDev::setSplitFileName(int pageNum, GBool closeprev) {
+    GString* tmp = NULL;
+    
+    char *pn, ptext[32];
+    
+    for( int i = 0, j = 0; i < Docname->getLength(); i++, j++ ){
+        const char *replace = NULL;
+        switch ( Docname->getChar(i) ){
+            case '\%': 
+                sprintf(ptext,"%d",pageNum);
+                pn = ptext;
+                
+                replace = pn;  
+                break;
+        }
+        
+        if( replace ){
+            if( !tmp ) tmp = new GString( Docname );
+            if( tmp ){
+                tmp->del( j, 1 );
+                int l = strlen( replace );
+                tmp->insert( j, replace, l );
+                j += l - 1;
+            }
+        }
+        
+    }
+    
+    if(closeprev)
+        fclose(page);
+    
+    page=fopen(tmp->getCString(),"w");
+}
 
 void ImgOutputDev::endPage() {
   pages->conv();
   pages->coalesce();
-  pages->dump(page, pageNum, passedFirstPage);
+
+  // reassign page if running split mode ever nth page  
+  /*
+   if(split>0){
+   int p;
+   for(p = 0; p < split; p++)
+   {
+   GString* tmp = NULL;
+   
+   char *pn, ptext[32];
+   
+   for( int i = 0, j = 0; i < Docname->getLength(); i++, j++ ){
+   const char *replace = NULL;
+   switch ( Docname->getChar(i) ){
+   case '\%': 
+   sprintf(ptext,"%d",p);
+   pn = ptext;
+   
+   replace = pn;  
+   break;
+   }
+   
+   if( replace ){
+   if( !tmp ) tmp = new GString( Docname );
+   if( tmp ){
+   tmp->del( j, 1 );
+   int l = strlen( replace );
+   tmp->insert( j, replace, l );
+   j += l - 1;
+   }
+   }
+   
+   }
+   
+   printf("PROCESS: %s",tmp->getCString());
+   }        
+   }
+   */
+    
+  //printf("doc: %s",Docname->getCString());
+  //printf("split: %d", this->split);  
+  
+  // reassign page based on split if split is higher than 1
+  if(this->split>0 && (pageNum % this->split) == 0){
+      fputs("]",page);
+      this->passedFirstPage = gFalse;
+      this->setSplitFileName(pageNum + this->split,true);
+      fputs("[",page);      
+      //printf("PROCESS: %s",tmp->getCString());
+      //printf("mod %d",(this->split-(this->split/pageNum)*pageNum)); 
+  }
+    
+  pages->dump(page, pageNum, passedFirstPage,(this->numPages));
   passedFirstPage = gTrue;
   // I don't yet know what to do in the case when there are pages of different
   // sizes and we want complex output: running ghostscript many times 

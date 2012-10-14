@@ -50,6 +50,7 @@ GBool noframes=gFalse;
 GBool stout=gFalse;
 GBool xml=gFalse;
 GBool errQuiet=gFalse;
+static int split = -1;
 
 GBool showHidden = gFalse;
 GBool noMerge = gTrue;
@@ -84,6 +85,8 @@ static ArgDesc argDesc[] = {
    "zoom the pdf document (default 1.5)"}, */
   {"-xml",    argFlag,    &xml,         0,
    "output for XML post-processing"},
+  {"-split",   argInt,    &split,         0,
+     "split the output every nth page"},     
   {"-hidden", argFlag,   &showHidden,   0,
    "output hidden text"},
   {"-enc",    argString,   textEncName,    sizeof(textEncName),
@@ -233,20 +236,22 @@ int main(int argc, char *argv[]) {
   if(textAsJSON)
 	xml = gTrue;
 
+  
   // write text file
   htmlOut = new ImgOutputDev(htmlFileName->getCString(), 
-	  docTitle->getCString(), 
-	  author ? author->getCString() : NULL,
-	  keywords ? keywords->getCString() : NULL, 
+      docTitle->getCString(), 
+      author ? author->getCString() : NULL,
+      keywords ? keywords->getCString() : NULL, 
           subject ? subject->getCString() : NULL, 
-	  date ? date->getCString() : NULL,
-	  extension,
-	  rawOrder,
-	  textAsJSON,
-	  compressData, 
-	  firstPage,
-	  doc->getCatalog()->getOutline()->isDict(),
-	  doc->getNumPages());
+      date ? date->getCString() : NULL,
+      extension,
+      rawOrder,
+      textAsJSON,
+      compressData, 
+      split,
+      firstPage,                  
+      doc->getCatalog()->getOutline()->isDict(),
+      doc->getNumPages());
   delete docTitle;
   if( author )
   {   
@@ -267,15 +272,16 @@ int main(int argc, char *argv[]) {
 
   if (htmlOut->isOk())
   {
-	doc->displayPages(htmlOut, firstPage, lastPage, static_cast<int>(72*scale), static_cast<int>(72*scale), 0, gTrue, gTrue,gTrue,NULL);
-  	
-	if (!xml)
-	{
-		htmlOut->dumpDocOutline(doc->getCatalog());
-	}
+    doc->displayPages(htmlOut, firstPage, lastPage, static_cast<int>(72*scale), static_cast<int>(72*scale), 0, gTrue, gTrue,gTrue,NULL);
+    
+    if (!xml)
+    {
+        htmlOut->dumpDocOutline(doc->getCatalog());
+    }
   }
     
   delete htmlOut;
+
 
   // clean up
  error:

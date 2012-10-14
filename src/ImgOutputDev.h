@@ -127,7 +127,7 @@ public:
     links->AddLink(x);
   }
 
- void dump(FILE *f, int pageNum, GBool passedFirstPage);
+ void dump(FILE *f, int pageNum, GBool passedFirstPage, int totalPages);
 
   // Clear the page.
   void clear();
@@ -148,7 +148,7 @@ private:
   HtmlString *yxCur1, *yxCur2;	// cursors for yxStrings list
   
   void setDocName(char* fname);
-  void dumpAsXML(FILE* f,int page, GBool passedFirstPage);
+  void dumpAsXML(FILE* f,int page, GBool passedFirstPage, int totalPages);
   void dumpComplex(FILE* f, int page);
 
   // marks the position of the fonts that belong to current page (for noframes)
@@ -208,6 +208,7 @@ public:
 	  GBool rawOrder,
 	  GBool textAsJSON,
 	  GBool compressData,
+      int split = -1,
 	  int firstPage = 1,
 	  GBool outline = 0,
 	  int numPages = 0);
@@ -241,6 +242,8 @@ public:
 
   // End a page.
   virtual void endPage();
+    
+  virtual void setSplitFileName(int pageNum, GBool closeprev);  
 
   //----- update text state
   virtual void updateFont(GfxState *state);
@@ -300,6 +303,7 @@ private:
   GString *Docname;
   GString *docTitle;
   GList *glMetaVars;
+  int split;                // split output every n    
   int numPages;
   friend class HtmlPage;
 };

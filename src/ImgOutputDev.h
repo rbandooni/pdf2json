@@ -242,6 +242,8 @@ public:
 
   // End a page.
   virtual void endPage();
+
+  virtual GBool hasValidSplitFileName();      
     
   virtual void setSplitFileName(int pageNum, GBool closeprev);  
 

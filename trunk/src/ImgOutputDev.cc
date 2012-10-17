@@ -822,7 +822,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
       //if (xml && !textAsJSON) right->append(".xml");
       //else if (textAsJSON) right->append(".js");
       
-      if(this->split>0){
+      if(this->split>0 && this->hasValidSplitFileName()){
         this->setSplitFileName(10,false);
       }else if (!(page=fopen(right->getCString(),"w"))){
           delete right;
@@ -898,6 +898,16 @@ void ImgOutputDev::startPage(int pageNum, GfxState *state,double crop_x1, double
     
   delete str;
 } 
+
+GBool ImgOutputDev::hasValidSplitFileName() {
+    for( int i = 0, j = 0; i < Docname->getLength(); i++, j++ ){
+        if(Docname->getChar(i) == '\%'){
+            return gTrue;
+        }
+    }
+    
+    return gFalse;
+}
 
 void ImgOutputDev::setSplitFileName(int pageNum, GBool closeprev) {
     GString* tmp = NULL;
@@ -979,7 +989,7 @@ void ImgOutputDev::endPage() {
   //printf("split: %d", this->split);  
   
   // reassign page based on split if split is higher than 1
-  if(this->split>0 && (pageNum % this->split) == 0){
+  if(this->split>0 && (pageNum % this->split) == 0 && this->hasValidSplitFileName()){
       if(textAsJSON){fputs("]",page);}else{fputs("</pdf2xml>\n",page);}
       this->passedFirstPage = gFalse;
       this->setSplitFileName(pageNum + this->split,true);

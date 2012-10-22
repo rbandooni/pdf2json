@@ -163,7 +163,9 @@ private:
   int X1;
   int X2;    
   int Y1;
-  int Y2;        
+  int Y2;
+  int movex;
+  int movey;  
   static int pgNum;
   int firstPage;                // used to begin the numeration of pages
 

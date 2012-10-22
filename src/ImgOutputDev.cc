@@ -84,8 +84,8 @@ HtmlString::HtmlString(GfxState *state, double fontSize, double _charspace, XmlF
     state->getFillRGB(&rgb);
     GString *name = state->getFont()->getName();
     if (!name) name = XmlFont::getDefaultFont(); //new GString("default");
-   // XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),_charspace, rgb);
-    XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),0.0, rgb);
+    XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),_charspace, rgb);
+//    XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),0.0, rgb);
     fontpos = fonts->AddFont(hfont);
   } else {
     // this means that the PDF file draws text without a current font,
@@ -465,12 +465,25 @@ void HtmlPage::coalesce() {
         diff = str2->xMax - str1->xMin;
 
         n = str1->len + str2->len;
-      
+        
+        if ((addSpace = horSpace > 0.1 * space)) {
+            ++n;
+        }
+              
         str1->size = (n + 15) & ~15;
         str1->text = (Unicode *)grealloc(str1->text,
 				       str1->size * sizeof(Unicode));   
         str1->xRight = (double *)grealloc(str1->xRight,
 					str1->size * sizeof(double));
+        
+        if (addSpace) {
+            str1->text[str1->len] = 0x20;
+            str1->htext->append(" ");
+            str1->htext2->append(" ");
+            str1->xRight[str1->len] = str2->xMin;
+            ++str1->len;
+            ++str1->strSize;
+        }
       
         str1->htext2->append(str2->htext2);
 
@@ -531,7 +544,7 @@ void HtmlPage::coalesce() {
         delete str2;
     } else { 
 
-        //     printf("startX = %f, endX = %f, diff = %f, fontsize = %d, pxSize = %f, stringSize = %d, cspace = %f, strSize = %f\n",str1->xMin,str1->xMax,diff,hfont1->getSize(),pxSize,sSize,cspace,strSize);
+        //printf("startX = %f, endX = %f, diff = %f, fontsize = %d, pxSize = %f, stringSize = %d, cspace = %f, strSize = %f\n",str1->xMin,str1->xMax,diff,hfont1->getSize(),pxSize,sSize,cspace,strSize);
 
         // keep strings separate
         //      printf("no\n"); 
@@ -643,7 +656,7 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage, int totalPages
             //fprintf(f,"{\"t\":%d,\"l\":%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
             //fprintf(f,"\"w\":%d,\"h\":%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
             //fprintf(f,"\"f\":%d,\"d\":\"", tmp->fontpos);
-            fprintf(f,"[%d,%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
+            fprintf(f,"[%d,%d,",xoutRound(tmp->yMin+this->movey),xoutRound(tmp->xMin+this->movex));	
             fprintf(f,"%d,%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
             fprintf(f,"%d,\"", tmp->fontpos);
 		  
@@ -874,6 +887,8 @@ void ImgOutputDev::startPage(int pageNum, GfxState *state,double crop_x1, double
     if(x2<x1) {double x3=x1;x1=x2;x2=x3;}
     if(y2<y1) {double y3=y1;y1=y2;y2=y3;}
     
+    pages->movex = -(int)x1;
+    pages->movey = -(int)y1; 
     
   this->pageNum = pageNum;
   GString *str=basename(Docname);
@@ -1029,6 +1044,7 @@ void ImgOutputDev::drawChar(GfxState *state, double x, double y,
   if ( !showHidden && (state->getRender() & 3) == 3) {
     return;
   }
+//    printf("movex: %f",dx);
   pages->addChar(state, x, y, dx, dy, originX, originY, u, uLen);
 }
 

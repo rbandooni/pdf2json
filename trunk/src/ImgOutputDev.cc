@@ -625,7 +625,7 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage, int totalPages
               if(passedFirst){
                   fprintf(f,",");
               }
-              fprintf(f,"{\"top\":%d,\"left\":%d,",xoutRound(tmp->yMin),xoutRound(tmp->xMin));	
+              fprintf(f,"{\"top\":%d,\"left\":%d,",xoutRound(tmp->yMin+this->movey),xoutRound(tmp->xMin+this->movex));	
               fprintf(f,"\"width\":%d,\"height\":%d,",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
               fprintf(f,"\"font\":%d,\"data\":\"", tmp->fontpos);
               if (tmp->fontpos!=-1){
@@ -636,7 +636,7 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage, int totalPages
               //fprintf(f,"\"}");
               passedFirst = true;
 	      }else{
-              fprintf(f,"<text top=\"%d\" left=\"%d\" ",xoutRound(tmp->yMin),xoutRound(tmp->xMin));
+              fprintf(f,"<text top=\"%d\" left=\"%d\" ",xoutRound(tmp->yMin+this->movey),xoutRound(tmp->xMin+this->movey));
               fprintf(f,"width=\"%d\" height=\"%d\" ",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
               fprintf(f,"font=\"%d\">", tmp->fontpos);
               if (tmp->fontpos!=-1){
@@ -668,7 +668,7 @@ void HtmlPage::dumpAsXML(FILE* f,int page, GBool passedFirstPage, int totalPages
             
             passedFirst = true;
         }else{
-              fprintf(f,"<t t=\"%d\" l=\"%d\" ",xoutRound(tmp->yMin),xoutRound(tmp->xMin));
+              fprintf(f,"<t t=\"%d\" l=\"%d\" ",xoutRound(tmp->yMin+this->movey),xoutRound(tmp->xMin+this->movex));
               fprintf(f,"w=\"%d\" h=\"%d\" ",xoutRound(tmp->xMax-tmp->xMin),xoutRound(tmp->yMax-tmp->yMin));
               fprintf(f,"f=\"%d\">", tmp->fontpos);
               if (tmp->fontpos!=-1){

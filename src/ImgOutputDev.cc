@@ -84,8 +84,8 @@ HtmlString::HtmlString(GfxState *state, double fontSize, double _charspace, XmlF
     state->getFillRGB(&rgb);
     GString *name = state->getFont()->getName();
     if (!name) name = XmlFont::getDefaultFont(); //new GString("default");
-    XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),_charspace, rgb);
-//    XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),0.0, rgb);
+    //XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),_charspace, rgb);
+    XmlFont hfont=XmlFont(name, static_cast<int>(fontSize-1),0.0, rgb);
     fontpos = fonts->AddFont(hfont);
   } else {
     // this means that the PDF file draws text without a current font,

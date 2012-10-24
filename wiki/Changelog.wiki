@@ -1,3 +1,6 @@
+* 25 Oct 2012* (Version 0.61)
+ * Regression issue causing some character encodings to fail corrected. 
+
 * 23 Oct 2012* (Version 0.60)
  * Issue related to adjusting the bounding box X and Y for certain pdf documents corrected
  * Handling for spacing in documents where this character is missing improved

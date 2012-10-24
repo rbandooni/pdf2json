@@ -177,9 +177,9 @@ GBool XmlFont::isEqualIgnoreBold(const XmlFont& x) const{
 }
 
 GString* XmlFont::getFontName(){
-//   if (pos!=font_num) return new GString(fonts[pos].name);
-  //  else return new GString(DefaultFont);
-    return new GString(FontName);
+   if (pos!=font_num) return new GString(fonts[pos].name);
+    else return new GString(DefaultFont);
+//    return new GString(FontName);
 }
 
 GString* XmlFont::getFullName(){

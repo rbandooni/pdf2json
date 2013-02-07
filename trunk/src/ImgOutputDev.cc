@@ -460,6 +460,8 @@ void HtmlPage::coalesce() {
         !(str2->len == 1 && str2->htext->getCString()[0] == ' ')
         &&
         !(str1->htext->getCString()[str1->len-1] == ' ')
+        &&
+        !(str1->htext->getLength() >= str1->len+1 && str1->htext->getCString()[str1->len+1] == ' ')
        ) 
     {
         diff = str2->xMax - str1->xMin;
@@ -817,7 +819,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.61"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.63"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  

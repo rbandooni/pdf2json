@@ -330,11 +330,11 @@ void HtmlPage::endString() {
   // throw away zero-length strings -- they don't have valid xMin/xMax
   // values, and they're useless anyway
     
-  if (curStr->len == 0) {
+   if (curStr->len == 0) {
     delete curStr;
-    curStr = NULL;
+     curStr = NULL;
     return;
-  }
+   }
 
   curStr->endString();
 
@@ -468,11 +468,11 @@ void HtmlPage::coalesce() {
 
         n = str1->len + str2->len;
 
-        /*
+        
         if ((addSpace = horSpace > 0.1 * space)) {
             ++n;
         }
-         */
+         
               
         str1->size = (n + 15) & ~15;
         str1->text = (Unicode *)grealloc(str1->text,
@@ -480,14 +480,14 @@ void HtmlPage::coalesce() {
         str1->xRight = (double *)grealloc(str1->xRight,
 					str1->size * sizeof(double));
         
-        /*if (addSpace) {
+        if (addSpace) {
             str1->text[str1->len] = 0x20;
             str1->htext->append(" ");
             str1->htext2->append(" ");
             str1->xRight[str1->len] = str2->xMin;
             ++str1->len;
             ++str1->strSize;
-        }*/
+        }
       
         str1->htext2->append(str2->htext2);
 
@@ -819,7 +819,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.63"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.64"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  

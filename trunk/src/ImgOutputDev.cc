@@ -487,65 +487,76 @@ void HtmlPage::coalesce() {
             str1->xRight[str1->len] = str2->xMin;
             ++str1->len;
             ++str1->strSize;
-        }
-      
-        str1->htext2->append(str2->htext2);
-
-        XmlLink *hlink1 = str1->getLink();
-        XmlLink *hlink2 = str2->getLink();
-
-        for (i = 0; i < str2->len; ++i) {
-            str1->text[str1->len] = str2->text[i];
-            str1->xRight[str1->len] = str2->xRight[i];
-            ++str1->len;
-        }
-
-        if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
             
-            if(hlink1 != NULL ){
-                //str1->htext->append("\"]");
-            }
-            if(hlink2 != NULL ) {
-                GString *ls = hlink2->getLinkStart();
-                str1->htext->append(ls);
-                delete ls;
-            }
+            str1->xMin = curX; str1->yMin = curY; 
+	        str1 = str2;
+	        curX = str1->xMin; curY = str1->yMin;
+	        hfont1 = hfont2;
+	
+	        if( str1->getLink() != NULL ) {
+	            GString *ls = str1->getLink()->getLinkStart();
+	            str1->htext->insert(0, ls);
+	            delete ls;
+	        }
+        }else{
+	        str1->htext2->append(str2->htext2);
+	
+	        XmlLink *hlink1 = str1->getLink();
+	        XmlLink *hlink2 = str2->getLink();
+	
+	        for (i = 0; i < str2->len; ++i) {
+	            str1->text[str1->len] = str2->text[i];
+	            str1->xRight[str1->len] = str2->xRight[i];
+	            ++str1->len;
+	        }
+	
+	        if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
+	            
+	            if(hlink1 != NULL ){
+	                //str1->htext->append("\"]");
+	            }
+	            if(hlink2 != NULL ) {
+	                GString *ls = hlink2->getLinkStart();
+	                str1->htext->append(ls);
+	                delete ls;
+	            }
+	        }
+	
+	        str1->htext->append(str2->htext);
+	        sSize = str1->htext2->getLength();      
+	        pxSize = xoutRoundLower(hfont1->getSize()/scale);
+	        strSize = (pxSize*(sSize-2));   
+	        cspace = (diff / strSize);//(strSize-pxSize));
+	        // we check if the fonts are the same and create a new font to ajust the text
+	        //      double diff = str2->xMin - str1->xMin;
+	        //      printf("%s\n",str1->htext2->getCString());
+	        // str1 now contains href for link of str2 (if it is defined)
+	        str1->link = str2->link; 
+	
+	        //XmlFont *newfnt = new XmlFont(*hfont1);
+	        //newfnt->setCharSpace(cspace);
+	        //newfnt->setLineSize(curLineSize);
+	        //str1->fontpos = fonts->AddFont(*newfnt);
+	        //delete newfnt;
+	        hfont1 = getFont(str1);
+	        // we have to reget hfont2 because it's location could have
+	        // changed on resize  GStri;ng *iStr=GString::fromInt(i);
+	        hfont2 = getFont(str2); 
+	
+	        hfont1 = hfont2;
+	
+	        if (str2->xMax > str1->xMax) {
+	            str1->xMax = str2->xMax;
+	        }
+	        
+	        if (str2->yMax > str1->yMax) {
+	            str1->yMax = str2->yMax;
+	        }
+	
+	        str1->yxNext = str2->yxNext;
+	
+	        delete str2;
         }
-
-        str1->htext->append(str2->htext);
-        sSize = str1->htext2->getLength();      
-        pxSize = xoutRoundLower(hfont1->getSize()/scale);
-        strSize = (pxSize*(sSize-2));   
-        cspace = (diff / strSize);//(strSize-pxSize));
-        // we check if the fonts are the same and create a new font to ajust the text
-        //      double diff = str2->xMin - str1->xMin;
-        //      printf("%s\n",str1->htext2->getCString());
-        // str1 now contains href for link of str2 (if it is defined)
-        str1->link = str2->link; 
-
-        //XmlFont *newfnt = new XmlFont(*hfont1);
-        //newfnt->setCharSpace(cspace);
-        //newfnt->setLineSize(curLineSize);
-        //str1->fontpos = fonts->AddFont(*newfnt);
-        //delete newfnt;
-        hfont1 = getFont(str1);
-        // we have to reget hfont2 because it's location could have
-        // changed on resize  GStri;ng *iStr=GString::fromInt(i);
-        hfont2 = getFont(str2); 
-
-        hfont1 = hfont2;
-
-        if (str2->xMax > str1->xMax) {
-            str1->xMax = str2->xMax;
-        }
-        
-        if (str2->yMax > str1->yMax) {
-            str1->yMax = str2->yMax;
-        }
-
-        str1->yxNext = str2->yxNext;
-
-        delete str2;
     } else { 
 
         //printf("startX = %f, endX = %f, diff = %f, fontsize = %d, pxSize = %f, stringSize = %d, cspace = %f, strSize = %f\n",str1->xMin,str1->xMax,diff,hfont1->getSize(),pxSize,sSize,cspace,strSize);
@@ -819,7 +830,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.64"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.65"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  

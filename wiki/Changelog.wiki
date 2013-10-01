@@ -1,4 +1,8 @@
 #labels Featured
+* 23 Sept 2013* (Version 0.65)
+ * Correction for hidden text and letter spacing
+ * Corrections for escape character 0x01 and 0x07
+
 * 25 Oct 2012* (Version 0.61)
  * Regression issue causing some character encodings to fail corrected. 
 

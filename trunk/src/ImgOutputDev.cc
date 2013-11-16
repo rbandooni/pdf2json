@@ -1336,8 +1336,8 @@ GString* ImgOutputDev::getLinkDest(Link *link,Catalog* catalog){
 	  { 
           LinkURI *ha=(LinkURI *) link->getAction();
           //GString* file=new GString(ha->getURI()->getCString());
-          GString *file=new GString("actionURI:");
-          file->append("url(");file->append(ha->getURI()->getCString());file->append(");");
+          GString *file=new GString("actionURI");
+          file->append("(");file->append(ha->getURI()->getCString());file->append("):");
           //file->append(ha->getURI()->getCString());
           // printf("uri : %s\n",file->getCString());
           return file;

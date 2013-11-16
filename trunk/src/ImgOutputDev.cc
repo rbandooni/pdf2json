@@ -830,7 +830,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.65"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.66"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  
@@ -1281,9 +1281,10 @@ GString* ImgOutputDev::getLinkDest(Link *link,Catalog* catalog){
           LinkGoTo *ha=(LinkGoTo *)link->getAction();
           LinkDest *dest=NULL;
           if (ha->getDest()==NULL) 
-              dest=catalog->findDest(ha->getNamedDest());
-          else 
               dest=ha->getDest()->copy();
+          else if (ha->getNamedDest()!=NULL)
+	      	  dest=catalog->findDest(ha->getNamedDest());
+	      
           if (dest){ 
               if (dest->isPageRef()){
                   Ref pageref=dest->getPageRef();
@@ -1336,6 +1337,7 @@ GString* ImgOutputDev::getLinkDest(Link *link,Catalog* catalog){
           LinkURI *ha=(LinkURI *) link->getAction();
           //GString* file=new GString(ha->getURI()->getCString());
           GString *file=new GString("actionURI:");
+          file->append("url(");file->append(ha->getURI()->getCString());file->append(");");
           //file->append(ha->getURI()->getCString());
           // printf("uri : %s\n",file->getCString());
           return file;

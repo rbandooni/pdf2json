@@ -280,15 +280,39 @@ static GString* EscapeSpecialChars( GString* s)
                 case '>': replace = "\\u003E";  break;
                 case '\'': replace = "\\u0027";  break;
                 case '&': replace = "\\u0026";  break;
-                case '\n': replace = "";  break;
-                case '\b': replace = "";  break;
-                case '\r': replace = "";  break;
-                case '\t': replace = "";  break;
-                case '\f': replace = "";  break;
                 case 0x01: replace = "";  break;
+                case 0x02: replace = "";  break;                
+                case 0x03: replace = "";  break;                
+                case 0x04: replace = "";  break;                
+                case 0x05: replace = "";  break;                
+                case 0x06: replace = "";  break;                                
                 case 0x07: replace = "";  break;
+                case 0x08: replace = "";  break;                
+                case 0x09: replace = "";  break;                
+                case 0x0a: replace = "";  break;                
+                case 0x0b: replace = "";  break;                
+                case 0x0c: replace = "";  break;                
+                case 0x0d: replace = "";  break;                
+                case 0x0e: replace = "";  break;                
+                case 0x0f: replace = "";  break;                
+                case 0x10: replace = "";  break;                                
+                case 0x11: replace = "";  break;                                                
+                case 0x12: replace = "";  break;                                                
+                case 0x13: replace = "";  break;                                                
+                case 0x14: replace = "";  break;                                                
+                case 0x15: replace = "";  break;                                                
+                case 0x16: replace = "";  break;                                                
+                case 0x17: replace = "";  break;                                                
+                case 0x18: replace = "";  break;                                                
+                case 0x19: replace = "";  break;  
+                case 0x1a: replace = "";  break;                                                                
+                case 0x1b: replace = "";  break;                  
+                case 0x1c: replace = "";  break;                  
+                case 0x1d: replace = "";  break;                  
+                case 0x1e: replace = "";  break;                  
+                case 0x1f: replace = "";  break;                  
                 default: continue;
-            }
+            }    
 	    if( replace ){
 	        if( !tmp ) tmp = new GString( s );
 	        if( tmp ){

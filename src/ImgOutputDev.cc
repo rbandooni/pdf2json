@@ -830,7 +830,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.67"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.68"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  
@@ -1281,9 +1281,11 @@ GString* ImgOutputDev::getLinkDest(Link *link,Catalog* catalog){
           LinkGoTo *ha=(LinkGoTo *)link->getAction();
           LinkDest *dest=NULL;
           if (ha->getDest()==NULL) 
-              dest=ha->getDest()->copy();
+              dest=catalog->findDest(ha->getNamedDest());
           else if (ha->getNamedDest()!=NULL)
-	      	  dest=catalog->findDest(ha->getNamedDest());
+          	  dest=catalog->findDest(ha->getNamedDest());
+          else
+	      	  dest=ha->getDest()->copy();
 	      
           if (dest){ 
               if (dest->isPageRef()){

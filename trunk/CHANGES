@@ -1,14 +1,21 @@
+pdf2image 0.69
+=======================
+- correction for multiple links incorrectly stacking up
+
+
 pdf2image 0.64
 =======================
 - correction for documents containing hidden text
 - correction for some words not breaking up properly in very specific scenarios
 - added escaping of backspace character
 
+
 pdf2image 0.40
 =======================
 - updated Xpdf to 3.01p2
 - improved the output of complex mode documents
 - fixed links, They should not include text that should not be part of the link anymore.
+
 
 pdf2image 0.49
 =======================

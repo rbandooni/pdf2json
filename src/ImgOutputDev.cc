@@ -385,7 +385,7 @@ void HtmlPage::coalesce() {
   HtmlString *str1, *str2;
   XmlFont *hfont1, *hfont2;
   double space, horSpace, vertSpace, vertOverlap;
-  GBool addSpace, addLineBreak;
+  GBool addSpace, addLineBreak, diffLinkDest;
   int n, i;
   double curX, curY, lastX, lastY;
   int sSize = 0;      
@@ -429,9 +429,17 @@ void HtmlPage::coalesce() {
     horSpace = str2->xMin - str1->xMax;
     addLineBreak = !noMerge && (fabs(str1->xMin - str2->xMin) < 0.4);
     vertSpace = str2->yMin - str1->yMax;
-
+    diffLinkDest = false;
+      
     //printf("coalesce %d %d %f? ", str1->dir, str2->dir, d);
 
+    if(!diffLinkDest && (str1->getLink() != NULL && str2->getLink() != NULL)){
+        XmlLink *hlink1 = str1->getLink();
+        XmlLink *hlink2 = str2->getLink();
+        diffLinkDest = !hlink1->isEqualDest(*hlink2);
+    }
+      
+      
     if (str2->yMin >= str1->yMin && str2->yMin <= str1->yMax)
     {
         vertOverlap = str1->yMax - str2->yMin;
@@ -462,6 +470,8 @@ void HtmlPage::coalesce() {
         !(str1->htext->getCString()[str1->len-1] == ' ')
         &&
         !(str1->htext->getLength() >= str1->len+1 && str1->htext->getCString()[str1->len+1] == ' ')
+        &&
+        !diffLinkDest
        ) 
     {
         diff = str2->xMax - str1->xMin;
@@ -472,8 +482,7 @@ void HtmlPage::coalesce() {
         if ((addSpace = horSpace > 0.1 * space)) {
             ++n;
         }
-         
-              
+        
         str1->size = (n + 15) & ~15;
         str1->text = (Unicode *)grealloc(str1->text,
 				       str1->size * sizeof(Unicode));   
@@ -509,56 +518,74 @@ void HtmlPage::coalesce() {
 	            str1->xRight[str1->len] = str2->xRight[i];
 	            ++str1->len;
 	        }
-	
-	        if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
-	            
-	            if(hlink1 != NULL ){
-	                //str1->htext->append("\"]");
-	            }
-	            if(hlink2 != NULL ) {
-	                GString *ls = hlink2->getLinkStart();
-	                str1->htext->append(ls);
-	                delete ls;
-	            }
-	        }
-	
-	        str1->htext->append(str2->htext);
-	        sSize = str1->htext2->getLength();      
-	        pxSize = xoutRoundLower(hfont1->getSize()/scale);
-	        strSize = (pxSize*(sSize-2));   
-	        cspace = (diff / strSize);//(strSize-pxSize));
-	        // we check if the fonts are the same and create a new font to ajust the text
-	        //      double diff = str2->xMin - str1->xMin;
-	        //      printf("%s\n",str1->htext2->getCString());
-	        // str1 now contains href for link of str2 (if it is defined)
-	        str1->link = str2->link; 
-	
-	        //XmlFont *newfnt = new XmlFont(*hfont1);
-	        //newfnt->setCharSpace(cspace);
-	        //newfnt->setLineSize(curLineSize);
-	        //str1->fontpos = fonts->AddFont(*newfnt);
-	        //delete newfnt;
-	        hfont1 = getFont(str1);
-	        // we have to reget hfont2 because it's location could have
-	        // changed on resize  GStri;ng *iStr=GString::fromInt(i);
-	        hfont2 = getFont(str2); 
-	
-	        hfont1 = hfont2;
-	
-	        if (str2->xMax > str1->xMax) {
-	            str1->xMax = str2->xMax;
-	        }
-	        
-	        if (str2->yMax > str1->yMax) {
-	            str1->yMax = str2->yMax;
-	        }
-	
-	        str1->yxNext = str2->yxNext;
-	
-	        delete str2;
+            
+            if( !hlink1 || !hlink2 || !hlink1->isEqualDest(*hlink2) ) {
+                
+                if(hlink1 != NULL ){
+                    //str1->htext->append("\"]");
+                }
+                if(hlink2 != NULL ) {
+                    GString *ls = hlink2->getLinkStart();
+                    str1->htext->append(ls);
+                    delete ls;
+                }
+            }
+            
+            str1->htext->append(str2->htext);
+            sSize = str1->htext2->getLength();
+            pxSize = xoutRoundLower(hfont1->getSize()/scale);
+            strSize = (pxSize*(sSize-2));
+            cspace = (diff / strSize);//(strSize-pxSize));
+            // we check if the fonts are the same and create a new font to ajust the text
+            //      double diff = str2->xMin - str1->xMin;
+            //      printf("%s\n",str1->htext2->getCString());
+            // str1 now contains href for link of str2 (if it is defined)
+            str1->link = str2->link;
+            
+            //XmlFont *newfnt = new XmlFont(*hfont1);
+            //newfnt->setCharSpace(cspace);
+            //newfnt->setLineSize(curLineSize);
+            //str1->fontpos = fonts->AddFont(*newfnt);
+            //delete newfnt;
+            hfont1 = getFont(str1);
+            // we have to reget hfont2 because it's location could have
+            // changed on resize  GStri;ng *iStr=GString::fromInt(i);
+            hfont2 = getFont(str2);
+            
+            hfont1 = hfont2;
+            
+            if (str2->xMax > str1->xMax) {
+                str1->xMax = str2->xMax;
+            }
+            
+            if (str2->yMax > str1->yMax) {
+                str1->yMax = str2->yMax;
+            }
+            
+            str1->yxNext = str2->yxNext;
+            
+            delete str2;
         }
     } else { 
+        if(diffLinkDest){
+            if (str2->xMax > str1->xMax) {
+                str1->xMax = str2->xMax;
+            }
+            
+            if (str2->yMax > str1->yMax) {
+                str1->yMax = str2->yMax;
+            }
 
+            str1->xMin = curX; str1->yMin = curY;
+            str1 = str2;
+            curX = str1->xMin; curY = str1->yMin;
+            hfont1 = hfont2;
+        }else{
+            str1->xMin = curX; str1->yMin = curY;
+            str1 = str2;
+            curX = str1->xMin; curY = str1->yMin;
+            hfont1 = hfont2;
+        }
         //printf("startX = %f, endX = %f, diff = %f, fontsize = %d, pxSize = %f, stringSize = %d, cspace = %f, strSize = %f\n",str1->xMin,str1->xMax,diff,hfont1->getSize(),pxSize,sSize,cspace,strSize);
 
         // keep strings separate
@@ -567,12 +594,8 @@ void HtmlPage::coalesce() {
 //        if(str1->getLink() != NULL )
   //          str1->htext->append("\"]");  
      
-        str1->xMin = curX; str1->yMin = curY; 
-        str1 = str2;
-        curX = str1->xMin; curY = str1->yMin;
-        hfont1 = hfont2;
-
-        if( str1->getLink() != NULL ) {
+        
+        if( str1->getLink() != NULL && !(str1->len == 1 && str1->htext->getCString()[0] == ' ')) {
             GString *ls = str1->getLink()->getLinkStart();
             str1->htext->insert(0, ls);
             delete ls;
@@ -830,7 +853,7 @@ ImgOutputDev::ImgOutputDev(char *fileName, char *title,
   pages = new HtmlPage(rawOrder, textAsJSON, compressData, extension);
   
   glMetaVars = new GList();
-  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.68"));  
+  glMetaVars->append(new HtmlMetaVar("generator", "pdf2json 0.71"));  
   if( author ) glMetaVars->append(new HtmlMetaVar("author", author));  
   if( keywords ) glMetaVars->append(new HtmlMetaVar("keywords", keywords));  
   if( date ) glMetaVars->append(new HtmlMetaVar("date", date));  
@@ -1341,7 +1364,7 @@ GString* ImgOutputDev::getLinkDest(Link *link,Catalog* catalog){
           GString *file=new GString("actionURI");
           file->append("(");file->append(ha->getURI()->getCString());file->append("):");
           //file->append(ha->getURI()->getCString());
-          // printf("uri : %s\n",file->getCString());
+          //printf("uri : %s\n",file->getCString());
           return file;
 	  }
       case actionLaunch:
